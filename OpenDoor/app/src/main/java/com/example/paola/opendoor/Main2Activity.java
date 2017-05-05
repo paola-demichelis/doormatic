@@ -18,7 +18,9 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -35,6 +37,7 @@ public class Main2Activity extends AppCompatActivity {
     public ImageView iv;
     public Button share;
     public Button open;
+    public Button openFriends;
 
     public String nome;
     DatabaseReference myRef;
@@ -49,6 +52,7 @@ public class Main2Activity extends AppCompatActivity {
         iv=(ImageView) findViewById(R.id.imageView);
         share=(Button) findViewById(R.id.button3);
         open=(Button) findViewById(R.id.button4);
+        openFriends=(Button) findViewById(R.id.button2);
 
 
         nome = getIntent().getStringExtra("name");
@@ -81,7 +85,50 @@ public class Main2Activity extends AppCompatActivity {
                 });
             }
         });
+        openFriends.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                myRef.child("friend").addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        List<User> list = new ArrayList<>();
+                        //HashMap<String,User> list2=new HashMap<String, User>();
+                        for (DataSnapshot child: dataSnapshot.getChildren()) {
+                            User user = child.getValue(User.class);
+                            list.add(user);
 
+                            //list.add(child.getValue(User.class));
+                        }
+                        Intent intent = new Intent(getApplicationContext(),ActivityOpenFriends.class);
+                        ArrayList<String> nomi=new ArrayList<String>();
+                        ArrayList<String> date=new ArrayList<String>();
+
+                        for(int i=0;i<list.size();i++){
+                            nomi.add(list.get(i).getName());
+                        }
+                        for(int i=0;i<list.size();i++){
+                            date.add(list.get(i).getFecha());
+                        }
+                        //intent.putExtra("friends",(ArrayList<User>) list);
+                        intent.putExtra("names",nomi);
+                        intent.putExtra("dates",date);
+
+                        startActivity(intent);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError error) {
+                    }
+                });
+            }
+        });
+
+
+
+
+
+
+/*
         open.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -92,10 +139,10 @@ public class Main2Activity extends AppCompatActivity {
             }
         });
 
-
+*/
 
     }
-
+/*
     private class MyAsyncTask extends AsyncTask<String, Integer, Double> {
 
         @Override
@@ -132,5 +179,5 @@ public class Main2Activity extends AppCompatActivity {
             }
         }
 
-    }
+    }*/
 }
