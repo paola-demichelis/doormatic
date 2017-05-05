@@ -1,44 +1,42 @@
 package com.example.paola.opendoor;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
-import android.os.CountDownTimer;
-import android.support.annotation.NonNull;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.firebase.ui.storage.images.FirebaseImageLoader;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FileDownloadTask;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 
 public class Main2Activity extends AppCompatActivity {
 
     public TextView tv;
     public ImageView iv;
-   // private StorageReference mStorageRef;
     public Button share;
+    public Button open;
+
+    public String nome;
     DatabaseReference myRef;
     FirebaseDatabase database;
 
@@ -50,19 +48,17 @@ public class Main2Activity extends AppCompatActivity {
         tv=(TextView) findViewById(R.id.textView2);
         iv=(ImageView) findViewById(R.id.imageView);
         share=(Button) findViewById(R.id.button3);
+        open=(Button) findViewById(R.id.button4);
 
-        String nome = getIntent().getStringExtra("name");
+
+        nome = getIntent().getStringExtra("name");
         String surname = getIntent().getStringExtra("surname");
         String adress = getIntent().getStringExtra("adress");
-
 
         tv.setText(nome+"\n"+surname+"\n"+adress);
 
         database = FirebaseDatabase.getInstance();
         myRef = database.getReference(nome);
-
-
-
 
         share.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -81,55 +77,60 @@ public class Main2Activity extends AppCompatActivity {
 
                     @Override
                     public void onCancelled(DatabaseError error) {
-                        // Failed to read value
                     }
                 });
             }
         });
 
-
-    //    mStorageRef = FirebaseStorage.getInstance().getReference();
-/*
-        Glide.with(this)
-                .using(new FirebaseImageLoader())
-                .load(mStorageRef)
-                .into(iv);
-
-        new CountDownTimer(30000, 1000) {
-
-            public void onTick(long millisUntilFinished) {
-                //tv.setText("il tuo codice è ancora valido per: " + millisUntilFinished / 1000);
-            }
-
-            public void onFinish() {
-                tv.setText("done!");
-            }
-        }.start();
-       // tv.setText(nome+"  "+surname+"  "+adress);
-        File localFile = null;
-        try {
-            localFile = File.createTempFile("paola", "jpg");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-
-        riversRef.getFile(localFile)
-                .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                        StorageReference temp = taskSnapshot.getStorage();
-                        Bitmap img = BitmapFactory.decodeFile(temp.getPath());
-                        iv.setImageBitmap(img);
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
+        open.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onFailure(@NonNull Exception exception) {
+            public void onClick(View view) {
+
+                    new MyAsyncTask().execute(nome);
+                    new MyAsyncTask().postData(nome);
+
             }
         });
-*/
+
 
 
     }
 
+    private class MyAsyncTask extends AsyncTask<String, Integer, Double> {
+
+        @Override
+        protected Double doInBackground(String... params) {
+            // TODO Auto-generated method stub
+            postData(params[0]);
+            return null;
+        }
+
+        protected void onPostExecute(Double result){
+            Toast.makeText(getApplicationContext(), "command sent", Toast.LENGTH_LONG).show();
+        }
+        protected void onProgressUpdate(Integer... progress){
+        }
+
+        public void postData(String valueIWantToSend) {
+            // Create a new HttpClient and Post Header
+            HttpClient httpclient = new DefaultHttpClient();
+            HttpPost httppost = new HttpPost("http://indirizzo del rasberry");
+
+            try {
+                // Add your data
+                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+                nameValuePairs.add(new BasicNameValuePair("nome", valueIWantToSend));
+                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+
+                // Execute HTTP Post Request
+                HttpResponse response = httpclient.execute(httppost);
+
+            } catch (ClientProtocolException e) {
+                // TODO Auto-generated catch block
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+            }
+        }
+
+    }
 }
