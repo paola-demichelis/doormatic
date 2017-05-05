@@ -1,18 +1,24 @@
 package com.example.paola.opendoor;
 
-/**
- * Created by paola on 19/04/17.
- */
 
-class User {
+public  class User {
     public String name;
-    public String code;
+    public String fecha;
 
 
-    User(String pname, String pcode){
+    User( ){
+    }
+
+    User( String pcode,String pname){
 
         name=pname;
-        code=pcode;
+        fecha=pcode;
 
+    }
+    String getName(){
+        return name;
+    }
+    String getFecha(){
+        return fecha;
     }
 }
