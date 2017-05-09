@@ -2,8 +2,8 @@ package com.example.paola.opendoor;
 
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -17,19 +17,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
 
 public class Main2Activity extends AppCompatActivity {
 
@@ -122,62 +114,44 @@ public class Main2Activity extends AppCompatActivity {
                 });
             }
         });
-
-
-
-
-
-
-/*
         open.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                    new MyAsyncTask().execute(nome);
-                    new MyAsyncTask().postData(nome);
+                String url = "http://10.25.91.119:8080/abrir";
+                Toast.makeText(getApplicationContext(), "Opening door", Toast.LENGTH_LONG).show();
+                new Opening().execute(url);
+                //new Opening().postData(url);
 
             }
         });
 
-*/
-
     }
-/*
-    private class MyAsyncTask extends AsyncTask<String, Integer, Double> {
+    private class Opening extends AsyncTask<String, Void, String> {
 
         @Override
-        protected Double doInBackground(String... params) {
-            // TODO Auto-generated method stub
+        protected String doInBackground(String...params){
             postData(params[0]);
-            return null;
+            return "successfully";
         }
 
-        protected void onPostExecute(Double result){
-            Toast.makeText(getApplicationContext(), "command sent", Toast.LENGTH_LONG).show();
-        }
-        protected void onProgressUpdate(Integer... progress){
+        protected void onPostExecute(String result){
+            Toast.makeText(getApplicationContext(), "Door closed " + result, Toast.LENGTH_LONG).show();
+
         }
 
-        public void postData(String valueIWantToSend) {
-            // Create a new HttpClient and Post Header
-            HttpClient httpclient = new DefaultHttpClient();
-            HttpPost httppost = new HttpPost("http://indirizzo del rasberry");
-
+        public void postData(String web) {
             try {
-                // Add your data
-                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-                nameValuePairs.add(new BasicNameValuePair("nome", valueIWantToSend));
-                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-
-                // Execute HTTP Post Request
-                HttpResponse response = httpclient.execute(httppost);
-
-            } catch (ClientProtocolException e) {
-                // TODO Auto-generated catch block
+                URL url = new URL(web);
+                HttpURLConnection urlc = (HttpURLConnection) url.openConnection();
+                urlc.connect();
+                if (urlc.getResponseCode() == 200) {
+                }
+            } catch (MalformedURLException e1) {
+                e1.printStackTrace();
             } catch (IOException e) {
-                // TODO Auto-generated catch block
+                e.printStackTrace();
             }
         }
 
-    }*/
+    }
 }
